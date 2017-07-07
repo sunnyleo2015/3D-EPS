@@ -4,7 +4,9 @@ import { MapComponent } from './map.component';
 
 @NgModule({
   imports: [
-    CommonModule
+    CommonModule,
+  ],
+  exports:[
   ],
   declarations: [MapComponent]
 })

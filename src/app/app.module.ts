@@ -5,6 +5,7 @@ import { AppComponent } from './app.component';
 import { routing} from './app.route';
 
 import { RebirthNGModule } from 'rebirth-ng';
+import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import { ControlModule } from './control/control.module';
 import { MapModule } from './map/map.module'
@@ -13,6 +14,8 @@ import { MapModule } from './map/map.module'
   imports: [
     BrowserModule,
     RebirthNGModule.forRoot(),
+    BrowserAnimationsModule,
+    NoopAnimationsModule,
     routing,
     ControlModule,
     MapModule,
@@ -22,7 +25,7 @@ import { MapModule } from './map/map.module'
     MapModule,
   ],
   declarations: [
-    AppComponent
+    AppComponent,
   ],
   providers: [],
   bootstrap: [AppComponent]

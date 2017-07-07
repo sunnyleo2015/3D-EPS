@@ -1,3 +1,7 @@
-<p>
-  layout works!
-</p>
+<header>
+  <re-menu-bar [menuOptions]="menu" [type]="'navbar-static-top'"></re-menu-bar>
+  <re-menu-bar class="clearfix" [menuOptions]="sidebar" [type]="'sidebar'"></re-menu-bar>
+</header>
+<div class="page-window clearfix">
+  <ng-content></ng-content>
+</div>

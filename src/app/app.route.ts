@@ -1,13 +1,13 @@
 import { Route,RouterModule } from '@angular/router';
-import { AppComponent } from './app.component';
 import { ModuleWithProviders } from '@angular/core';
 import { MapComponent } from './map/map.component';
+import { ControlComponent } from './control/control.component';
 
 const ROUTER_CONFIG: Route[] = [
   {
     path: '',
     pathMatch: 'full',
-    component: AppComponent,
+    component: ControlComponent,
   },
   {
     path: 'map',
