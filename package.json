@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve --port 4300",
+    "start": "ng serve --port 4200",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
@@ -29,6 +29,7 @@
     "ng2-bootstrap": "^1.3.3",
     "rebirth-ng": "0.0.16",
     "rxjs": "^5.1.0",
+    "socket.io-client": "^2.0.3",
     "three": "^0.86.0",
     "three-trackballcontrols": "0.0.5",
     "zone.js": "^0.8.4"
