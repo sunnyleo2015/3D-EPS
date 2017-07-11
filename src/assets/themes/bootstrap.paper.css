@@ -4336,7 +4336,6 @@ tbody.collapse.in {
   display: inline-block;
   width: 0;
   height: 0;
-  margin-right: 5px;
   vertical-align: middle;
   border-top: 4px dashed;
   border-top: 4px solid \9;
@@ -4344,6 +4343,7 @@ tbody.collapse.in {
   border-left: 4px solid transparent;
   float: right;
   margin-top: 10px;
+  margin-right: 25px;
 }
 
 .dropup,

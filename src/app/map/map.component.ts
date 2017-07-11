@@ -3,7 +3,6 @@ import * as THREE from 'three';
 import * as Trackballcontrols from 'three-trackballcontrols';
 import { DispatherService } from '../service/dispather.service';
 import * as _ from 'lodash';
-import {split} from "ts-node/dist";
 
 @Component({
   selector: 'app-map',
@@ -19,12 +18,14 @@ export class MapComponent implements OnInit {
   trackBallControls;
   clock = new THREE.Clock();
   delta = this.clock.getDelta();
-  labelList = [];
-
   doRenderFlag = false;
 
   dispather;
+
+  labelList = [];
   labelInfo = [];
+  lastTimeLabelsInfo = [];
+
   message;
 
   @ViewChild('MapGL')  mapGL: ElementRef;
@@ -44,13 +45,17 @@ export class MapComponent implements OnInit {
     this.DS.message.subscribe((res)=>{
       this.message = res.data;
       let label = res.data.split(',');
+      let update = false;
       _.map(this.labelInfo,(event)=>{
-          if (label[1] = event.id){
+          if (label[1] === event.id){
             event = {id: label[1], x: label[2], y: label[3], z: label[4], status: label[5]};
+            update = true;
             return;
           }
       });
-      this.labelInfo.push( {id: label[1], x: label[2], y: label[3], z: label[4], status: label[5]});
+      if(!update){
+        this.labelInfo.push( {id: label[1], x: label[2], y: label[3], z: label[4], status: label[5]});
+      }
     });
 
     this.initDraw();
@@ -144,7 +149,7 @@ export class MapComponent implements OnInit {
   initTrackBallControls(){
     this.trackBallControls = new Trackballcontrols(this.camera, this.renderer.domElement);
     this.trackBallControls.target.set(0,0,0);
-    this.trackBallControls.rotateSpeed = 1.0;
+    this.trackBallControls.rotateSpeed = 3.0;
     this.trackBallControls.zoomSpeed = 1.0;
     this.trackBallControls.panSpeed = 1.0;
   }
@@ -155,8 +160,6 @@ export class MapComponent implements OnInit {
       _.each(this.labelInfo,(label)=>{
         this.initSphereLabel(label);
       });
-    }else {
-
     }
     requestAnimationFrame(()=>{return this.doRender()});
     this.renderer.render(this.scene, this.camera);
@@ -164,8 +167,10 @@ export class MapComponent implements OnInit {
       _.forEach(this.labelInfo, (label)=>{
         this.scene.remove(this.scene.getObjectByName(`label-${label.id}`));
       });
+      this.lastTimeLabelsInfo = this.labelInfo;
       this.labelInfo = [];
       this.labelList = [];
+      console.log(this.lastTimeLabelsInfo);
     }
   }
 
@@ -202,9 +207,15 @@ export class MapComponent implements OnInit {
     this.scene.add(sphereLabel);
   }
 
-  showLabelInfo(){
-    console.log(this.labelInfo);
+  updateSphereLabel(label){
+    this.scene.getObjectByName(`label-${label.id}`).position.set(label.x,label.y,label.z);
+    _.forEach(this.labelList,(event)=>{
+      if(event.name === `label-${label.id}`){
+        event.position.set(label.x,label.y,label.z);
+      }
+    });
   }
+
 
   stopRender(){
     this.doRenderFlag = !this.doRenderFlag;
