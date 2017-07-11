@@ -3,13 +3,13 @@ import * as Rx from 'rxjs/Rx';
 
 @Injectable()
 export class WebSocketService {
-  private socket: Rx.Subject<MessageEvent>;
+  private socket: Rx.Subject<any>;
 
-  private create(url): Rx.Subject<MessageEvent>{
+  private create(url): Rx.Subject<any>{
     let ws = new WebSocket(url);
 
     let observable = Rx.Observable.create(
-      (obs: Rx.Observer<MessageEvent>)=>{
+      (obs: Rx.Observer<any>)=>{
         ws.onmessage = obs.next.bind(obs);
         ws.onerror = obs.error.bind(obs);
         ws.onclose = obs.complete.bind(obs);
@@ -24,17 +24,18 @@ export class WebSocketService {
           ws.send(JSON.stringify(data));
         }
       }
-    }
+    };
 
     return Rx.Subject.create(observer, observable);
   }
 
   constructor() { }
 
-  public connect(url): Rx.Subject<MessageEvent>{
+  public connect(url): Rx.Subject<any>{
     if(!this.socket){
       this.socket = this.create(url);
     }
     return this.socket;
   }
+
 }

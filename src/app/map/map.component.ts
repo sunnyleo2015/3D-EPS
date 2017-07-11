@@ -1,7 +1,9 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import * as THREE from 'three';
 import * as Trackballcontrols from 'three-trackballcontrols';
-
+import { DispatherService } from '../service/dispather.service';
+import * as _ from 'lodash';
+import {split} from "ts-node/dist";
 
 @Component({
   selector: 'app-map',
@@ -15,33 +17,43 @@ export class MapComponent implements OnInit {
   scene;
   light;
   trackBallControls;
-  stats;
   clock = new THREE.Clock();
   delta = this.clock.getDelta();
   labelList = [];
-  labelNameList = [];
-  lookAtMesh;
-  stopRender = false;
-  stopRenderController;
-  renderInterval;
+
+  doRenderFlag = false;
+
+  dispather;
+  labelInfo = [];
+  message;
 
   @ViewChild('MapGL')  mapGL: ElementRef;
-  constructor(private el:ElementRef) {
-  }
+  constructor(private el:ElementRef, private DS: DispatherService) {
 
+  }
 
   ngAfterViewInit(){
 
   }
 
   ngOnInit() {
-    this.initRenderer();
-    this.initCamera();
-    this.initScene();
-    this.initLight();
-    this.initFrame();
-    this.initTrackBallControls();
-    this.doRender();
+    this.dispather = this.DS.ws;
+    this.dispather.onmessage = (res)=>{
+      this.DS.message.next(res);
+    };
+    this.DS.message.subscribe((res)=>{
+      this.message = res.data;
+      let label = res.data.split(',');
+      _.map(this.labelInfo,(event)=>{
+          if (label[1] = event.id){
+            event = {id: label[1], x: label[2], y: label[3], z: label[4], status: label[5]};
+            return;
+          }
+      });
+      this.labelInfo.push( {id: label[1], x: label[2], y: label[3], z: label[4], status: label[5]});
+    });
+
+    this.initDraw();
   }
 
 
@@ -138,9 +150,63 @@ export class MapComponent implements OnInit {
   }
 
   doRender(){
-      this.trackBallControls.update(this.delta);
-      requestAnimationFrame(()=>{return this.doRender()});
-      this.renderer.render(this.scene, this.camera);
+    this.trackBallControls.update(this.delta);
+    if(this.doRenderFlag){
+      _.each(this.labelInfo,(label)=>{
+        this.initSphereLabel(label);
+      });
+    }else {
+
+    }
+    requestAnimationFrame(()=>{return this.doRender()});
+    this.renderer.render(this.scene, this.camera);
+    if(this.doRenderFlag){
+      _.forEach(this.labelInfo, (label)=>{
+        this.scene.remove(this.scene.getObjectByName(`label-${label.id}`));
+      });
+      this.labelInfo = [];
+      this.labelList = [];
+    }
   }
 
+  initDraw(){
+    this.initRenderer();
+    this.initCamera();
+    this.initScene();
+    this.initLight();
+    this.initFrame();
+    this.initTrackBallControls();
+    this.doRender();
+  }
+
+
+  getLabelInfo(){
+    this.dispather.send('$SUB_ALL');
+    this.dispather.send('UPDATE_RAIL');
+    this.dispather.send('$UPDATE_GATHER');
+    this.dispather.send('$UPDATE_REGION');
+    this.dispather.send('$SUB_WARN');
+    this.dispather.send('$SUB_WARN');
+  }
+
+  initSphereLabel(label){
+    let sphereGeometry = new THREE.SphereGeometry(4,10,10);
+    let sphereMaterial = new THREE.MeshBasicMaterial({color: 0xff0000});
+
+    let sphereLabel= new THREE.Mesh(sphereGeometry,sphereMaterial);
+
+    sphereLabel.position.set(label.x,label.y,label.z);
+    sphereLabel.name = `label-${label.id}`;
+
+    this.labelList.push(sphereLabel);
+    this.scene.add(sphereLabel);
+  }
+
+  showLabelInfo(){
+    console.log(this.labelInfo);
+  }
+
+  stopRender(){
+    this.doRenderFlag = !this.doRenderFlag;
+  }
 }

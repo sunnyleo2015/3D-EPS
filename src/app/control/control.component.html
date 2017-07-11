@@ -1,7 +1,2 @@
-<div>
-  <input [(ngModel)]="message" /><button (click)="sendMessage()">Click</button>
-  <div *ngFor="let msg of messages">
-    {{msg.text}}
-  </div>
-</div>
-
+<button class="btn btn-default" (click)="sendMessage()">send</button>
+{{ message }}

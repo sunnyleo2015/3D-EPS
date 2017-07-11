@@ -1,32 +1,16 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import * as io from 'socket.io-client';
+import {Subject} from 'rxjs/Subject';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/filter';
+
+const MANAGER_URL = 'ws://127.0.0.1:8888';
 
 @Injectable()
 export class ManagerService {
-  private url = 'http://localhost:8080';
-  private socket =io (this.url);
+  public message: Subject<any>  = new Subject<any>();
+  public ws =  new WebSocket(MANAGER_URL);
 
-  constructor() { }
+  constructor() {
 
-  public on(eventName){
-    let observable = new Observable(observer=>{
-      this.socket.on(eventName, data => {
-        observer.next(data);
-      });
-      return ()=>{
-        this.socket.disconnect()
-      }
-    });
-    return observable;
-  }
-
-  public emit(eventName, msg){
-    let observable = new Observable(observer=>{
-      this.socket.emit(eventName, msg, ()=>{
-        observer.next('ok');
-      });
-    });
-    return observable;
-  }
+  };
 }

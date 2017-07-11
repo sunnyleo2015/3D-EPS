@@ -10,6 +10,7 @@ import { RebirthNGModule } from 'rebirth-ng';
 
 import { WebSocketService } from '../service/webSocket.service';
 import { ManagerService } from '../service/manager.service';
+import { DispatherService } from '../service/dispather.service'
 
 @NgModule({
   imports: [
@@ -30,7 +31,8 @@ import { ManagerService } from '../service/manager.service';
   ],
   providers:[
     WebSocketService,
-    ManagerService
+    ManagerService,
+    DispatherService
   ]
 })
 export class ControlModule { }
