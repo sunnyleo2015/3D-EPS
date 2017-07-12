@@ -2,6 +2,7 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import * as THREE from 'three';
 import * as Trackballcontrols from 'three-trackballcontrols';
 import { DispatherService } from '../service/dispather.service';
+import { ConnectService } from '../service/connect.service';
 import * as _ from 'lodash';
 
 @Component({
@@ -29,7 +30,7 @@ export class MapComponent implements OnInit {
   message;
 
   @ViewChild('MapGL')  mapGL: ElementRef;
-  constructor(private el:ElementRef, private DS: DispatherService) {
+  constructor(private el:ElementRef, private DS: DispatherService, private CS: ConnectService) {
 
   }
 
@@ -38,29 +39,44 @@ export class MapComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.dispather = this.DS.ws;
-    this.dispather.onmessage = (res)=>{
-      this.DS.message.next(res);
-    };
-    this.DS.message.subscribe((res)=>{
-      this.message = res.data;
-      let label = res.data.split(',');
-      let update = false;
-      _.map(this.labelInfo,(event)=>{
+
+    console.log(this.CS.DISPATH_URL);
+
+    this.CS.DISPATH_URL.subscribe(res=>{
+      console.log(res);
+      this.dispather = new WebSocket(res);
+
+      this.dispather.onmessage = (res)=>{
+        this.DS.message.next(res);
+      };
+      this.DS.message.subscribe((res)=>{
+        this.message = res.data;
+        let label = res.data.split(',');
+        let update = false;
+        _.map(this.labelInfo,(event)=>{
           if (label[1] === event.id){
             event = {id: label[1], x: label[2], y: label[3], z: label[4], status: label[5]};
             update = true;
             return;
           }
+        });
+        if(!update){
+          this.labelInfo.push( {id: label[1], x: label[2], y: label[3], z: label[4], status: label[5]});
+        }
       });
-      if(!update){
-        this.labelInfo.push( {id: label[1], x: label[2], y: label[3], z: label[4], status: label[5]});
-      }
     });
+
+
 
     this.initDraw();
   }
 
+
+  setWebSocket(){
+    this.CS.DISPATH_URL.subscribe(res=>{
+      this.dispather = new WebSocket(res);
+    })
+  }
 
   initRenderer(){
     this.renderer =  new THREE.WebGLRenderer();

@@ -10,7 +10,10 @@ import { RebirthNGModule } from 'rebirth-ng';
 
 import { WebSocketService } from '../service/webSocket.service';
 import { ManagerService } from '../service/manager.service';
-import { DispatherService } from '../service/dispather.service'
+import { DispatherService } from '../service/dispather.service';
+import { ConnectService } from '../service/connect.service';
+import { ModalComponent } from './layout/modal/modal.component';
+import { ConnectComponent } from './layout/modal/connect/connect.component';
 
 @NgModule({
   imports: [
@@ -23,16 +26,21 @@ import { DispatherService } from '../service/dispather.service'
     ControlComponent,
     WallComponent,
     LayoutComponent,
+    ModalComponent,
+    ConnectComponent,
   ],
   exports: [
     ControlComponent,
     WallComponent,
     LayoutComponent,
+    ModalComponent,
+    ConnectComponent,
   ],
   providers:[
     WebSocketService,
     ManagerService,
-    DispatherService
+    DispatherService,
+    ConnectService
   ]
 })
 export class ControlModule { }

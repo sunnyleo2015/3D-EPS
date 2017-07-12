@@ -32,6 +32,8 @@
     "socket.io-client": "^2.0.3",
     "three": "^0.86.0",
     "three-trackballcontrols": "0.0.5",
+    "ui-model": "0.0.23",
+    "ui-model-angular": "0.0.23",
     "zone.js": "^0.8.4"
   },
   "devDependencies": {

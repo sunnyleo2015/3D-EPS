@@ -5,3 +5,6 @@
 <div class="page-window clearfix">
   <ng-content></ng-content>
 </div>
+<app-modal #ipConnect *ngIf="openConnectModal">
+  <app-connect (close)="openConnectModal = false" (connectEngine)="connectEngine()"></app-connect>
+</app-modal>

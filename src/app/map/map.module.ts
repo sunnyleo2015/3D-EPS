@@ -1,8 +1,8 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MapComponent } from './map.component';
-
-import { WebSocketService } from '../service/webSocket.service';
+import { DispatherService } from '../service/dispather.service';
+import { ConnectService } from '../service/connect.service';
 
 @NgModule({
   imports: [
@@ -13,7 +13,8 @@ import { WebSocketService } from '../service/webSocket.service';
   ],
   declarations: [MapComponent],
   providers: [
-    WebSocketService,
+    DispatherService,
+    ConnectService
   ]
 })
 export class MapModule { }
