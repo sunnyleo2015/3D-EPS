@@ -6,5 +6,5 @@
   <ng-content></ng-content>
 </div>
 <app-modal #ipConnect *ngIf="openConnectModal">
-  <app-connect (close)="openConnectModal = false" (connectEngine)="connectEngine()"></app-connect>
+  <app-connect (close)="openConnectModal = false" (connectEngine)="connectEngine($event)"></app-connect>
 </app-modal>

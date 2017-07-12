@@ -1,8 +1,8 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Router, ActivatedRoute } from "@angular/router";
 import * as THREE from 'three';
 import * as Trackballcontrols from 'three-trackballcontrols';
 import { DispatherService } from '../service/dispather.service';
-import { ConnectService } from '../service/connect.service';
 import * as _ from 'lodash';
 
 @Component({
@@ -10,7 +10,7 @@ import * as _ from 'lodash';
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.scss'],
 })
-export class MapComponent implements OnInit {
+export class MapComponent implements OnInit, OnDestroy {
 
   renderer ;
   camera;
@@ -19,7 +19,7 @@ export class MapComponent implements OnInit {
   trackBallControls;
   clock = new THREE.Clock();
   delta = this.clock.getDelta();
-  doRenderFlag = false;
+  doRenderFlag = true;
 
   dispather;
 
@@ -28,54 +28,51 @@ export class MapComponent implements OnInit {
   lastTimeLabelsInfo = [];
 
   message;
+  url;
+
+  routeSub;
 
   @ViewChild('MapGL')  mapGL: ElementRef;
-  constructor(private el:ElementRef, private DS: DispatherService, private CS: ConnectService) {
+  constructor(private router: Router, private route: ActivatedRoute, private el:ElementRef, private DS: DispatherService) {
 
   }
 
   ngAfterViewInit(){
-
+    setTimeout(()=>{this.getLabelInfo()}, 100);
   }
 
   ngOnInit() {
+    this.routeSub = this.route.params.subscribe((res) =>{
+      this.url = res.url;
 
-    console.log(this.CS.DISPATH_URL);
+      this.connectWebSocket();
 
-    this.CS.DISPATH_URL.subscribe(res=>{
-      console.log(res);
-      this.dispather = new WebSocket(res);
-
-      this.dispather.onmessage = (res)=>{
-        this.DS.message.next(res);
-      };
-      this.DS.message.subscribe((res)=>{
-        this.message = res.data;
-        let label = res.data.split(',');
-        let update = false;
-        _.map(this.labelInfo,(event)=>{
-          if (label[1] === event.id){
-            event = {id: label[1], x: label[2], y: label[3], z: label[4], status: label[5]};
-            update = true;
-            return;
-          }
-        });
-        if(!update){
-          this.labelInfo.push( {id: label[1], x: label[2], y: label[3], z: label[4], status: label[5]});
-        }
-      });
     });
 
-
-
     this.initDraw();
+
+    this.DS.message.subscribe((res)=>{
+      this.message = res.data;
+      let label = res.data.split(',');
+      let update = false;
+      _.map(this.labelInfo,(event)=>{
+        if (label[1] === event.id){
+          event = {id: label[1], x: label[2], y: label[3], z: label[4], status: label[5]};
+          update = true;
+          return;
+        }
+      });
+      if(!update){
+        this.labelInfo.push( {id: label[1], x: label[2], y: label[3], z: label[4], status: label[5]});
+      }
+    });
   }
 
-
-  setWebSocket(){
-    this.CS.DISPATH_URL.subscribe(res=>{
-      this.dispather = new WebSocket(res);
-    })
+  connectWebSocket(){
+    this.dispather = new WebSocket(this.url);
+    this.dispather.onmessage = (res)=>{
+      this.DS.message.next(res);
+    };
   }
 
   initRenderer(){
@@ -170,6 +167,19 @@ export class MapComponent implements OnInit {
     this.trackBallControls.panSpeed = 1.0;
   }
 
+  initSphereLabel(label){
+    let sphereGeometry = new THREE.SphereGeometry(4,10,10);
+    let sphereMaterial = new THREE.MeshBasicMaterial({color: 0xff0000});
+
+    let sphereLabel= new THREE.Mesh(sphereGeometry,sphereMaterial);
+
+    sphereLabel.position.set(label.x,label.y,label.z);
+    sphereLabel.name = `label-${label.id}`;
+
+    this.labelList.push(sphereLabel);
+    this.scene.add(sphereLabel);
+  }
+
   doRender(){
     this.trackBallControls.update(this.delta);
     if(this.doRenderFlag){
@@ -186,7 +196,6 @@ export class MapComponent implements OnInit {
       this.lastTimeLabelsInfo = this.labelInfo;
       this.labelInfo = [];
       this.labelList = [];
-      console.log(this.lastTimeLabelsInfo);
     }
   }
 
@@ -207,33 +216,17 @@ export class MapComponent implements OnInit {
     this.dispather.send('$UPDATE_GATHER');
     this.dispather.send('$UPDATE_REGION');
     this.dispather.send('$SUB_WARN');
-    this.dispather.send('$SUB_WARN');
-  }
-
-  initSphereLabel(label){
-    let sphereGeometry = new THREE.SphereGeometry(4,10,10);
-    let sphereMaterial = new THREE.MeshBasicMaterial({color: 0xff0000});
-
-    let sphereLabel= new THREE.Mesh(sphereGeometry,sphereMaterial);
-
-    sphereLabel.position.set(label.x,label.y,label.z);
-    sphereLabel.name = `label-${label.id}`;
-
-    this.labelList.push(sphereLabel);
-    this.scene.add(sphereLabel);
-  }
-
-  updateSphereLabel(label){
-    this.scene.getObjectByName(`label-${label.id}`).position.set(label.x,label.y,label.z);
-    _.forEach(this.labelList,(event)=>{
-      if(event.name === `label-${label.id}`){
-        event.position.set(label.x,label.y,label.z);
-      }
-    });
   }
 
 
-  stopRender(){
+
+  toggleRender(){
     this.doRenderFlag = !this.doRenderFlag;
+  }
+
+  ngOnDestroy(){
+    this.routeSub.unsubscribe();
+    this.dispather.onopen=this.dispather.onclose=this.dispather.onerror=this.dispather.onmessage=null;
+    this.dispather=null;
   }
 }

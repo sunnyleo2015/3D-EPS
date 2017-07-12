@@ -1,5 +1,4 @@
 import {Component, OnInit, Output, EventEmitter} from '@angular/core';
-import { ConnectService } from '../../../../service/connect.service'
 
 @Component({
   selector: 'app-connect',
@@ -9,22 +8,20 @@ import { ConnectService } from '../../../../service/connect.service'
 export class ConnectComponent implements OnInit {
 
   @Output() close: EventEmitter<void> = new EventEmitter<void>();
-  @Output() connectEngine: EventEmitter<void> = new EventEmitter<void>();
+  @Output() connectEngine: EventEmitter<any> = new EventEmitter<any>();
 
   ip = '127.0.0.1';
-  port = '8888';
+  port = '1111';
 
-  constructor(private connectService: ConnectService) { }
+  constructor() { }
 
   ngOnInit() {
 
   }
 
   connect(){
-    console.log(`${this.ip}:${this.port}`);
-    this.connectService.DISPATH_URL.next(`ws://${this.ip}:${this.port}`);
     this.closeModal();
-    this.connectEngine.emit();
+    this.connectEngine.emit(`ws://${this.ip}:${this.port}`);
   }
 
   closeModal(){

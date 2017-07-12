@@ -12,11 +12,13 @@ import * as _ from 'lodash';
 export class LayoutComponent implements OnInit, OnDestroy {
 
 
-  connectBtnCss = '';
-  startEngineCss = 'hide';
-  closeEngineCss = 'hide';
+  connectBtnCss: string = '';
+  startEngineCss: string = 'hide';
+  closeEngineCss: string = 'hide';
 
-  openConnectModal = false;
+  openConnectModal:boolean = false;
+
+  url: string;
 
   menu: MenuBar;
   sidebar: MenuBar;
@@ -50,11 +52,7 @@ export class LayoutComponent implements OnInit, OnDestroy {
         {
           text: '启动',
           handler: ()=>{
-            console.log('启动');
-            this.menu.menus[2].cssClass = 'hide';
-            this.menu.menus[3].cssClass = '';
-            this.showSolid();
-            this.router.navigate(['/map']);
+            this.startEngine();
           },
           cssClass: this.startEngineCss
         },
@@ -310,16 +308,22 @@ export class LayoutComponent implements OnInit, OnDestroy {
     this.sidebar.menus[0].cssClass = '';
   }
 
-  connectEngine(){
-    console.log('连接');
+  connectEngine(url){
     this.connectBtnCss = 'hide';
     this.startEngineCss = '';
     this.closeEngineCss = '';
     this.menu.menus[0].cssClass = this.connectBtnCss;
     this.menu.menus[1].cssClass = this.startEngineCss;
     this.menu.menus[2].cssClass = this.closeEngineCss;
+    this.url = url;
   }
 
+  startEngine(){
+    this.menu.menus[2].cssClass = 'hide';
+    this.menu.menus[3].cssClass = '';
+    this.showSolid();
+    this.router.navigate(['/map',{'url': this.url}]);
+  }
 
   ngOnDestroy(): void {
     this.routeSub.unsubscribe();
