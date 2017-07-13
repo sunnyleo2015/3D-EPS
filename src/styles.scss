@@ -1,6 +1,14 @@
 /* You can add global styles to this file, and also import other style files */
 $icon-font-path: "./assets/fonts/";
 
+*{
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+  border: none;
+  z-index: 0;
+}
+
 *[draggable=true] {
   -moz-user-select: none;
   -khtml-user-drag: element;

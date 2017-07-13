@@ -1,0 +1,22 @@
+:host
+{
+  ul{
+    display: block;
+    height: 300px;
+    li {
+      span {
+        display: inline-block;
+        width: 80px;
+        font-size: 14px;
+        padding: 0 10px;
+        box-sizing: border-box;
+      }
+      .id {
+        width: 40px;
+      }
+    }
+    :nth-of-type(even) li{
+      background-color: cornflowerblue;
+    }
+  }
+}

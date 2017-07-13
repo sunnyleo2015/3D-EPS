@@ -1,7 +1,8 @@
-<div>
-  <ul>
-    <li *ngFor="let label of labelList">
-      {{labelList}}
-    </li>
-  </ul>
-</div>
+<ngx-datatable class="material striped"
+               [columnMode]="'force'"
+               [loadingIndicator]="loadingIndicator"
+               [reorderable]="reorderable"
+               [columns]="columns"
+               [rows]="labelList"
+>
+</ngx-datatable>

@@ -3,6 +3,7 @@ import { Router, ActivatedRoute } from "@angular/router";
 import * as THREE from 'three';
 import * as Trackballcontrols from 'three-trackballcontrols';
 import { DispatherService } from '../service/dispather.service';
+import { ConnectService} from '../service/connect.service';
 import * as _ from 'lodash';
 
 @Component({
@@ -33,7 +34,9 @@ export class MapComponent implements OnInit, OnDestroy {
   routeSub;
 
   @ViewChild('MapGL')  mapGL: ElementRef;
-  constructor(private router: Router, private route: ActivatedRoute, private el:ElementRef, private DS: DispatherService) {
+  constructor(private router: Router, private route: ActivatedRoute,
+              private el: ElementRef, private DS: DispatherService,
+              private CS: ConnectService) {
 
   }
 
@@ -44,7 +47,6 @@ export class MapComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.routeSub = this.route.params.subscribe((res) =>{
       this.url = res.url;
-
       this.connectWebSocket();
 
     });
@@ -186,6 +188,10 @@ export class MapComponent implements OnInit, OnDestroy {
       _.each(this.labelInfo,(label)=>{
         this.initSphereLabel(label);
       });
+    }else {
+      _.each(this.lastTimeLabelsInfo,(label)=>{
+        this.initSphereLabel(label);
+      });
     }
     requestAnimationFrame(()=>{return this.doRender()});
     this.renderer.render(this.scene, this.camera);
@@ -196,6 +202,10 @@ export class MapComponent implements OnInit, OnDestroy {
       this.lastTimeLabelsInfo = this.labelInfo;
       this.labelInfo = [];
       this.labelList = [];
+    }else{
+      _.forEach(this.lastTimeLabelsInfo, (label)=>{
+        this.scene.remove(this.scene.getObjectByName(`label-${label.id}`));
+      });
     }
   }
 
@@ -224,9 +234,13 @@ export class MapComponent implements OnInit, OnDestroy {
     this.doRenderFlag = !this.doRenderFlag;
   }
 
-  ngOnDestroy(){
-    this.routeSub.unsubscribe();
+  clearDispather(){
     this.dispather.onopen=this.dispather.onclose=this.dispather.onerror=this.dispather.onmessage=null;
     this.dispather=null;
+  }
+
+  ngOnDestroy(){
+    this.routeSub.unsubscribe();
+
   }
 }

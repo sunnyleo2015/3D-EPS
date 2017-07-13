@@ -16,4 +16,11 @@
       width: calc(100vw - 200px);
     }
   }
+
+  .toolbar{
+    width: 450px;
+    position: fixed;
+    right: 0;
+    top: 64px;
+  }
 }

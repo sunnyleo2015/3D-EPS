@@ -11,7 +11,7 @@ export class ConnectComponent implements OnInit {
   @Output() connectEngine: EventEmitter<any> = new EventEmitter<any>();
 
   ip = '127.0.0.1';
-  port = '1111';
+  port = '8888';
 
   constructor() { }
 

@@ -4,10 +4,15 @@ import { MapComponent } from './map.component';
 import { DispatherService } from '../service/dispather.service';
 import { ConnectService } from '../service/connect.service';
 import { LabelListComponent } from './label-list/label-list.component';
+import { RebirthNGModule } from 'rebirth-ng';
+import { NgxDatatableModule } from '@swimlane/ngx-datatable';
+
 
 @NgModule({
   imports: [
     CommonModule,
+    RebirthNGModule,
+    NgxDatatableModule,
   ],
   exports:[
     MapComponent,

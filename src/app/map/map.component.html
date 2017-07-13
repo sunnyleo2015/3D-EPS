@@ -1,7 +1,17 @@
 <div #MapGL class="map clearfix">
 </div>
 <button class="btn btn-default" (click)="getLabelInfo()">connect</button>
-<button class="btn btn-default" (click)="toggleRender()">Toggle</button>
+<button class="btn btn-default" (click)="toggleRender()">Toggle Render</button>
 
-<div>{{this.message}}</div>
-<app-label-list [labelList]="lastTimeLabelsInfo"></app-label-list>
+<div class="toolbar">
+  <re-panel [collapsable]="true">
+    <re-panel-header>
+      <strong>Labels List</strong>
+    </re-panel-header>
+    <re-panel-body>
+      <app-label-list [labelList]="lastTimeLabelsInfo"></app-label-list>
+    </re-panel-body>
+  </re-panel>
+</div>
+
+
