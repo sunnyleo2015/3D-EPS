@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MapComponent } from './map.component';
 import { DispatherService } from '../service/dispather.service';
 import { ConnectService } from '../service/connect.service';
+import { AuthStatusService } from '../service/auth-status.service';
 import { LabelListComponent } from './label-list/label-list.component';
 import { RebirthNGModule } from 'rebirth-ng';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
@@ -24,7 +25,8 @@ import { NgxDatatableModule } from '@swimlane/ngx-datatable';
   ],
   providers: [
     DispatherService,
-    ConnectService
+    ConnectService,
+    //AuthStatusService,
   ]
 })
 export class MapModule { }

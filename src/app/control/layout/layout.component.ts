@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { MenuBar } from 'rebirth-ng/menu-bar/menu-bar.model';
 import { Router, ActivatedRoute } from "@angular/router";
 import * as _ from 'lodash';
-
+import { ConnectService } from '../../service/connect.service';
 
 @Component({
   selector: 'app-layout',
@@ -25,11 +25,19 @@ export class LayoutComponent implements OnInit, OnDestroy {
 
   routeSub;
 
-  constructor(private router: Router, private route: ActivatedRoute) { }
+  constructor(private router: Router,
+              private route: ActivatedRoute, private CS: ConnectService) { }
 
   ngOnInit() {
     this.routeSub = this.route.params.subscribe((res)=>{
-      console.log(res);
+    });
+    this.CS.IS_CONNECT.subscribe((res)=>{
+      if(res){
+        this.showSolid();
+      }
+      else {
+        this.hideSolid();
+      }
     });
 
     this.menu = {
@@ -321,8 +329,8 @@ export class LayoutComponent implements OnInit, OnDestroy {
   startEngine(){
     this.menu.menus[2].cssClass = 'hide';
     this.menu.menus[3].cssClass = '';
-    this.showSolid();
-    this.router.navigate(['/map',{'url': this.url}]);
+    this.CS.connect();
+    this.router.navigate(['/control/map',{'url': this.url}]);
   }
 
   ngOnDestroy(): void {

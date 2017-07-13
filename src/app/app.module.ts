@@ -8,7 +8,9 @@ import { RebirthNGModule } from 'rebirth-ng';
 import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import { ControlModule } from './control/control.module';
-import { MapModule } from './map/map.module'
+import { MapModule } from './map/map.module';
+
+import { AuthStatusService } from './service/auth-status.service';
 
 @NgModule({
   imports: [
@@ -27,7 +29,9 @@ import { MapModule } from './map/map.module'
   declarations: [
     AppComponent,
   ],
-  providers: [],
+  providers: [
+    AuthStatusService,
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

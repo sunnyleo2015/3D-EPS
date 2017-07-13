@@ -3,7 +3,6 @@ import { Router, ActivatedRoute } from "@angular/router";
 import * as THREE from 'three';
 import * as Trackballcontrols from 'three-trackballcontrols';
 import { DispatherService } from '../service/dispather.service';
-import { ConnectService} from '../service/connect.service';
 import * as _ from 'lodash';
 
 @Component({
@@ -35,20 +34,19 @@ export class MapComponent implements OnInit, OnDestroy {
 
   @ViewChild('MapGL')  mapGL: ElementRef;
   constructor(private router: Router, private route: ActivatedRoute,
-              private el: ElementRef, private DS: DispatherService,
-              private CS: ConnectService) {
+              private el: ElementRef, private DS: DispatherService,) {
 
   }
 
   ngAfterViewInit(){
-    setTimeout(()=>{this.getLabelInfo()}, 100);
+
   }
 
   ngOnInit() {
     this.routeSub = this.route.params.subscribe((res) =>{
       this.url = res.url;
       this.connectWebSocket();
-
+      setTimeout(()=>{this.getLabelInfo()}, 100);
     });
 
     this.initDraw();
@@ -241,6 +239,6 @@ export class MapComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(){
     this.routeSub.unsubscribe();
-
+    this.clearDispather();
   }
 }
