@@ -6667,7 +6667,7 @@ button.list-group-item-danger.active:focus {
 }
 
 .panel {
-  margin-bottom: 23px;
+  margin-bottom: 0;
   background-color: #ffffff;
   border: 1px solid transparent;
   border-radius: 3px;

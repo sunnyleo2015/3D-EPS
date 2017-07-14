@@ -1,20 +1,20 @@
-import {Component, OnInit, Input, OnChanges, Output, EventEmitter} from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
 @Component({
-  selector: 'app-label-list',
-  templateUrl: './label-list.component.html',
-  styleUrls: ['./label-list.component.scss']
+  selector: 'app-reader-list',
+  templateUrl: './reader-list.component.html',
+  styleUrls: ['./reader-list.component.scss']
 })
-export class LabelListComponent implements OnInit, OnChanges {
+export class ReaderListComponent implements OnInit {
 
-  @Input() labelList;
-  @Output() focusLabel:  EventEmitter<any> = new EventEmitter<any>();
+  @Input() readerList;
+  @Output() focusReader:  EventEmitter<any> = new EventEmitter<any>();
 
   mockLabelList = [
     {id: 1, x: 500, y: 500, z: 300, status: 5},
     {id: 1, x: 400, y: 600, z: 700, status: 5},
     {id: 1, x: 300, y: 200, z: 300, status: 5}
-    ];
+  ];
 
   loadingIndicator: boolean = true;
   reorderable: boolean = true;
@@ -23,7 +23,6 @@ export class LabelListComponent implements OnInit, OnChanges {
 
   columns = [
     { prop: 'id' },
-    { name: 'status'},
     { name: 'x' },
     { name: 'y' },
     { name: 'z'}
@@ -35,10 +34,11 @@ export class LabelListComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges() {
+
   }
 
   selectLabel(e) {
-    this.focusLabel.emit({x: e.selected[0].x, y: e.selected[0].y, z: e.selected[0].z,});
+    this.focusReader.emit({x: e.selected[0].x, y: e.selected[0].y, z: e.selected[0].z,});
     console.log(e.selected[0]);
   }
 }

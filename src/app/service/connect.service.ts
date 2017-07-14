@@ -6,7 +6,6 @@ import { Observable } from 'rxjs/Observable';
 export class ConnectService {
 
   public IS_CONNECT: Subject<boolean> = new Subject<boolean>();
-  public DISPATH_URL: Subject<string> = new Subject<string>();
 
   constructor() { }
   isConnect: boolean = false;

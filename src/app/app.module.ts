@@ -11,6 +11,7 @@ import { ControlModule } from './control/control.module';
 import { MapModule } from './map/map.module';
 
 import { AuthStatusService } from './service/auth-status.service';
+import { MethodService } from './service/method.service';
 
 @NgModule({
   imports: [
@@ -31,6 +32,7 @@ import { AuthStatusService } from './service/auth-status.service';
   ],
   providers: [
     AuthStatusService,
+    MethodService
   ],
   bootstrap: [AppComponent]
 })

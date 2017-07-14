@@ -323,7 +323,7 @@ export class LayoutComponent implements OnInit, OnDestroy {
     this.menu.menus[0].cssClass = this.connectBtnCss;
     this.menu.menus[1].cssClass = this.startEngineCss;
     this.menu.menus[2].cssClass = this.closeEngineCss;
-    this.url = 'ws://127.0.0.1:1111';
+    this.url = url;
   }
 
   startEngine(){

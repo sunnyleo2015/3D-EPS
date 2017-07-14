@@ -6,10 +6,18 @@
 <div class="toolbar">
   <re-panel [collapsable]="true">
     <re-panel-header>
-      <strong>Labels List</strong>
+      <strong>标签列表</strong>
     </re-panel-header>
     <re-panel-body>
-      <app-label-list [labelList]="lastTimeLabelsInfo"></app-label-list>
+      <app-label-list [labelList]="lastTimeLabelsInfo" (focusLabel)="focusLabel($event)"></app-label-list>
+    </re-panel-body>
+  </re-panel>
+  <re-panel [collapsable]="true">
+    <re-panel-header>
+      <strong>定位器列表</strong>
+    </re-panel-header>
+    <re-panel-body>
+      <app-reader-list [readerList]="readerList" (focusReader)="focusLabel($event)"></app-reader-list>
     </re-panel-body>
   </re-panel>
 </div>

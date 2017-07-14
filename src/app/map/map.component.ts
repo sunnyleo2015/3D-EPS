@@ -3,7 +3,9 @@ import { Router, ActivatedRoute } from "@angular/router";
 import * as THREE from 'three';
 import * as Trackballcontrols from 'three-trackballcontrols';
 import { DispatherService } from '../service/dispather.service';
+import { MethodService } from '../service/method.service';
 import * as _ from 'lodash';
+import {init} from "protractor/built/launcher";
 
 @Component({
   selector: 'app-map',
@@ -22,19 +24,24 @@ export class MapComponent implements OnInit, OnDestroy {
   doRenderFlag = true;
 
   dispather;
+  manager;
 
   labelList = [];
   labelInfo = [];
   lastTimeLabelsInfo = [];
 
+  readerList:any[] = [];
+
   message;
-  url;
+  DISPATH_URL:string = 'ws://127.0.0.1:1111';
+  MANAGER_URL:string;
 
   routeSub;
 
   @ViewChild('MapGL')  mapGL: ElementRef;
   constructor(private router: Router, private route: ActivatedRoute,
-              private el: ElementRef, private DS: DispatherService,) {
+              private el: ElementRef, private DS: DispatherService,
+              private methodService: MethodService) {
 
   }
 
@@ -44,10 +51,13 @@ export class MapComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.routeSub = this.route.params.subscribe((res) =>{
-      this.url = res.url;
-      this.connectWebSocket();
-      setTimeout(()=>{this.getLabelInfo()}, 100);
+      this.MANAGER_URL = res.url;
+      this.connectManager();
+      setTimeout(()=>{this.getLocalizeInfo()}, 100);
     });
+
+    this.connectDispather();
+    setTimeout(()=>{this.getLabelInfo()}, 100);
 
     this.initDraw();
 
@@ -68,10 +78,17 @@ export class MapComponent implements OnInit, OnDestroy {
     });
   }
 
-  connectWebSocket(){
-    this.dispather = new WebSocket(this.url);
+  connectDispather(){
+    this.dispather = new WebSocket(this.DISPATH_URL);
     this.dispather.onmessage = (res)=>{
       this.DS.message.next(res);
+    };
+  }
+
+  connectManager(){
+    this.manager = new WebSocket(this.MANAGER_URL);
+    this.manager.onmessage = (res)=>{
+      console.log(res);
     };
   }
 
@@ -180,6 +197,47 @@ export class MapComponent implements OnInit, OnDestroy {
     this.scene.add(sphereLabel);
   }
 
+  getLocalizeInfo(){
+    this.manager.send("$FILE_READ,1,reader.csv");
+    this.manager.onmessage = (res)=>{
+      this.readerList = this.methodService.formatDate(res).split(/\n/);
+      this.readerList.shift();
+      this.readerList.pop();
+      console.log(this.readerList);
+      this.readerList = _.map(this.readerList, (readerInfo)=>{
+        let reader = readerInfo.split(',');
+        return {
+          id: reader[0],
+          name: reader[1],
+          ip: reader[2],
+          x: reader[3],
+          y: reader[4],
+          z: reader[5],
+          latency: reader[6],
+          area: reader[7],
+          height: reader[8],
+          latencyId: reader[9]
+        }
+      });
+      console.log(this.readerList);
+      _.forEach(this.readerList,(reader)=>{
+        this.initReader(reader);
+      });
+    };
+  }
+
+  initReader(reader){
+  let readerGeometry = new THREE.BoxGeometry(10,10,10);
+  let readerMaterial = new THREE.MeshLambertMaterial({color: 0x2196f3});
+
+  let readerLabel = new THREE.Mesh(readerGeometry,readerMaterial);
+
+  readerLabel.name = `reader-${reader.id}`;
+  readerLabel.position.set(reader.x,reader.y,reader.z);
+
+  this.scene.add(readerLabel);
+}
+
   doRender(){
     this.trackBallControls.update(this.delta);
     if(this.doRenderFlag){
@@ -217,7 +275,6 @@ export class MapComponent implements OnInit, OnDestroy {
     this.doRender();
   }
 
-
   getLabelInfo(){
     this.dispather.send('$SUB_ALL');
     this.dispather.send('UPDATE_RAIL');
@@ -226,7 +283,9 @@ export class MapComponent implements OnInit, OnDestroy {
     this.dispather.send('$SUB_WARN');
   }
 
-
+  focusLabel(point){
+    this.trackBallControls.target.set(parseFloat(point.x),parseFloat(point.y),parseFloat(point.z));
+  }
 
   toggleRender(){
     this.doRenderFlag = !this.doRenderFlag;

@@ -1,14 +1,13 @@
-<div class="label-list">
+<div class="reader-list">
   <ngx-datatable class="material striped"
                  [columnMode]="'force'"
                  [loadingIndicator]="loadingIndicator"
                  [reorderable]="reorderable"
                  [columns]="columns"
-                 [rows]="labelList"
+                 [rows]="readerList"
                  [selectionType]="'single'"
                  [selected]="selections"
                  (select)="selectLabel($event)"
   >
   </ngx-datatable>
 </div>
-
