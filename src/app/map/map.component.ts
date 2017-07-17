@@ -5,7 +5,6 @@ import * as Trackballcontrols from 'three-trackballcontrols';
 import { DispatherService } from '../service/dispather.service';
 import { MethodService } from '../service/method.service';
 import * as _ from 'lodash';
-import {init} from "protractor/built/launcher";
 
 @Component({
   selector: 'app-map',
@@ -18,7 +17,12 @@ export class MapComponent implements OnInit, OnDestroy {
   camera;
   scene;
   light;
+
   trackBallControls;
+  noRotate: boolean = false;
+  noZoom: boolean =false;
+  noPan: boolean = false;
+
   clock = new THREE.Clock();
   delta = this.clock.getDelta();
   doRenderFlag = true;
@@ -227,19 +231,23 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   initReader(reader){
-  let readerGeometry = new THREE.BoxGeometry(10,10,10);
-  let readerMaterial = new THREE.MeshLambertMaterial({color: 0x2196f3});
+    let readerGeometry = new THREE.BoxGeometry(10,10,10);
+    let readerMaterial = new THREE.MeshLambertMaterial({color: 0x2196f3});
 
-  let readerLabel = new THREE.Mesh(readerGeometry,readerMaterial);
+    let readerLabel = new THREE.Mesh(readerGeometry,readerMaterial);
 
-  readerLabel.name = `reader-${reader.id}`;
-  readerLabel.position.set(reader.x,reader.y,reader.z);
+    readerLabel.name = `reader-${reader.id}`;
+    readerLabel.position.set(reader.x,reader.y,reader.z);
 
-  this.scene.add(readerLabel);
-}
+    this.scene.add(readerLabel);
+  }
 
   doRender(){
+    this.trackBallControls.noZoom  = this.noZoom;
+    this.trackBallControls.noRotate = this.noRotate;
+    this.trackBallControls.noPan = this.noPan;
     this.trackBallControls.update(this.delta);
+
     if(this.doRenderFlag){
       _.each(this.labelInfo,(label)=>{
         this.initSphereLabel(label);
@@ -285,6 +293,11 @@ export class MapComponent implements OnInit, OnDestroy {
 
   focusLabel(point){
     this.trackBallControls.target.set(parseFloat(point.x),parseFloat(point.y),parseFloat(point.z));
+  }
+
+  resetObservationFace(x,y,z){
+    this.camera.position.set(x,y,z);
+    this.initTrackBallControls();
   }
 
   toggleRender(){

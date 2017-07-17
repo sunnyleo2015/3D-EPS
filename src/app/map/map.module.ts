@@ -7,6 +7,7 @@ import { LabelListComponent } from './label-list/label-list.component';
 import { RebirthNGModule } from 'rebirth-ng';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { ReaderListComponent } from './reader-list/reader-list.component';
+import { FormsModule } from '@angular/forms';
 
 
 @NgModule({
@@ -14,6 +15,7 @@ import { ReaderListComponent } from './reader-list/reader-list.component';
     CommonModule,
     RebirthNGModule,
     NgxDatatableModule,
+    FormsModule
   ],
   exports:[
     MapComponent,

@@ -1,10 +1,9 @@
-<div #MapGL class="map clearfix">
-</div>
-<button class="btn btn-default" (click)="getLabelInfo()">connect</button>
+<div #MapGL class="map clearfix"></div>
+
 <button class="btn btn-default" (click)="toggleRender()">Toggle Render</button>
 
 <div class="toolbar">
-  <re-panel [collapsable]="true">
+  <re-panel [collapsable]="true" [isCollapsed]="true">
     <re-panel-header>
       <strong>标签列表</strong>
     </re-panel-header>
@@ -12,12 +11,47 @@
       <app-label-list [labelList]="lastTimeLabelsInfo" (focusLabel)="focusLabel($event)"></app-label-list>
     </re-panel-body>
   </re-panel>
-  <re-panel [collapsable]="true">
+
+  <re-panel [collapsable]="true" [isCollapsed]="true">
     <re-panel-header>
       <strong>定位器列表</strong>
     </re-panel-header>
     <re-panel-body>
       <app-reader-list [readerList]="readerList" (focusReader)="focusLabel($event)"></app-reader-list>
+    </re-panel-body>
+  </re-panel>
+
+  <re-panel [collapsable]="true" [isCollapsed]="true">
+    <re-panel-header>
+      <strong>设置观察面</strong>
+    </re-panel-header>
+    <re-panel-body>
+      <div class="btn-group">
+        <button class="btn btn-default btn-secondary" (click)="resetObservationFace(0,0,2600)">观察 XY 面</button>
+        <button class="btn btn-default btn-secondary" (click)="resetObservationFace(0,2600,0)">观察 XZ 面</button>
+        <button class="btn btn-default btn-secondary" (click)="resetObservationFace(2600,0,0)">观察 YZ 面</button>
+        <button class="btn btn-default btn-secondary" (click)="initCamera();initTrackBallControls();">重置镜头</button>
+      </div>
+    </re-panel-body>
+  </re-panel>
+
+  <re-panel [collapsable]="true" [isCollapsed]="true">
+    <re-panel-header>
+      <strong>设置轨迹球</strong>
+    </re-panel-header>
+    <re-panel-body>
+      <div class="input-group">
+        <input type="checkbox" id="noRotate" name="noRotate" [(ngModel)]="noRotate" >
+        <label for="noRotate">No Rotate</label>
+      </div>
+      <div class="input-group">
+        <input type="checkbox" id="noZoom" name="noZoom" [(ngModel)]="noZoom" >
+        <label for="noZoom">No Zoom</label>
+      </div>
+      <div class="input-group">
+        <input type="checkbox" id="noPan" name="noPan" [(ngModel)]="noPan" >
+        <label for="noPan">No Pan</label>
+      </div>
     </re-panel-body>
   </re-panel>
 </div>

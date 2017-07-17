@@ -4307,6 +4307,7 @@ input[type="button"].btn-block {
 
 .collapse.in {
   display: block;
+  text-align: center;
 }
 
 tr.collapse.in {
