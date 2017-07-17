@@ -4,7 +4,9 @@ import * as THREE from 'three';
 import * as Trackballcontrols from 'three-trackballcontrols';
 import { DispatherService } from '../service/dispather.service';
 import { MethodService } from '../service/method.service';
+import { SettingService } from '../service/setting.service';
 import * as _ from 'lodash';
+import * as $ from 'jquery';
 
 @Component({
   selector: 'app-map',
@@ -40,12 +42,15 @@ export class MapComponent implements OnInit, OnDestroy {
   DISPATH_URL:string = 'ws://127.0.0.1:1111';
   MANAGER_URL:string;
 
+
+  drawWalls: boolean = false;
+
   routeSub;
 
   @ViewChild('MapGL')  mapGL: ElementRef;
   constructor(private router: Router, private route: ActivatedRoute,
               private el: ElementRef, private DS: DispatherService,
-              private methodService: MethodService) {
+              private methodService: MethodService, private setting: SettingService) {
 
   }
 
@@ -80,6 +85,20 @@ export class MapComponent implements OnInit, OnDestroy {
         this.labelInfo.push( {id: label[1], x: label[2], y: label[3], z: label[4], status: label[5]});
       }
     });
+
+    this.setting.drawWalls.subscribe((res)=>{
+      this.drawWalls = res;
+      if(res){
+        $(this.renderer.domElement).on('mousedown', (e)=>{
+          if(e.which === 1){
+            this.onDocumentMouseDown(e)
+          }
+        });
+      }
+      else {
+        $(this.renderer.domElement).unbind('mousedown');
+      }
+    })
   }
 
   connectDispather(){
@@ -129,6 +148,19 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   initFrame(){
+    let planeGeometry = new THREE.PlaneGeometry(4000, 4000, 1, 1);
+    let planeMaterial = new THREE.MeshLambertMaterial({opacity: 0, transparent: true, color: 0xffffff});
+    let plane = new THREE.Mesh(planeGeometry, planeMaterial);
+
+
+    //plane.rotation.x = -0.5 * Math.PI;
+    plane.position.x = 0;
+    plane.position.y = 0;
+    plane.position.z = -1;
+
+    this.scene.add(plane);
+
+
     let material = new THREE.LineBasicMaterial({vertexColors: THREE.VertexColors});
     let frame_geometry = new THREE.Geometry();
     let point_color_1 = new THREE.Color(0x999999);
@@ -298,6 +330,29 @@ export class MapComponent implements OnInit, OnDestroy {
   resetObservationFace(x,y,z){
     this.camera.position.set(x,y,z);
     this.initTrackBallControls();
+  }
+
+  //围墙绘制
+  onDocumentMouseDown(event) {
+    event.preventDefault();
+    let vector = new THREE.Vector3(( event.clientX / window.innerWidth ) * 2 - 1, -( event.clientY / window.innerHeight ) * 2 + 1, 0.5);
+    vector = vector.unproject(this.camera);
+
+    let raycaster = new THREE.Raycaster(this.camera.position, vector.sub(this.camera.position).normalize());
+
+    let intersects = raycaster.intersectObjects(this.scene.children);
+
+    if (intersects.length > 0) {
+      console.log(intersects[0]);
+    }
+  }
+
+  drawWall(){
+
+  }
+
+  stopDrawWall(){
+    this.setting.drawWalls.next(false);
   }
 
   toggleRender(){

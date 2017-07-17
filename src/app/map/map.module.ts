@@ -12,7 +12,7 @@ import { FormsModule } from '@angular/forms';
 
 @NgModule({
   imports: [
-    CommonModule,
+   CommonModule,
     RebirthNGModule,
     NgxDatatableModule,
     FormsModule

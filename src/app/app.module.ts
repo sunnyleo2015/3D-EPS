@@ -12,6 +12,7 @@ import { MapModule } from './map/map.module';
 
 import { AuthStatusService } from './service/auth-status.service';
 import { MethodService } from './service/method.service';
+import { SettingService } from './service/setting.service';
 
 @NgModule({
   imports: [
@@ -32,7 +33,8 @@ import { MethodService } from './service/method.service';
   ],
   providers: [
     AuthStatusService,
-    MethodService
+    MethodService,
+    SettingService
   ],
   bootstrap: [AppComponent]
 })

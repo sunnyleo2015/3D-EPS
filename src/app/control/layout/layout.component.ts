@@ -3,6 +3,7 @@ import { MenuBar } from 'rebirth-ng/menu-bar/menu-bar.model';
 import { Router, ActivatedRoute } from "@angular/router";
 import * as _ from 'lodash';
 import { ConnectService } from '../../service/connect.service';
+import { SettingService } from '../../service/setting.service';
 
 @Component({
   selector: 'app-layout',
@@ -26,7 +27,8 @@ export class LayoutComponent implements OnInit, OnDestroy {
   routeSub;
 
   constructor(private router: Router,
-              private route: ActivatedRoute, private CS: ConnectService) { }
+              private route: ActivatedRoute, private CS: ConnectService,
+              private setting: SettingService) { }
 
   ngOnInit() {
     this.routeSub = this.route.params.subscribe((res)=>{
@@ -157,7 +159,9 @@ export class LayoutComponent implements OnInit, OnDestroy {
             {
               text: '添加围墙',
               icon: 'glyphicon glyphicon-plus-sign',
-              handler:()=>{}
+              handler:()=>{
+                this.setting.drawWalls.next(true)
+              }
             },
             {
               text: '围墙列表',

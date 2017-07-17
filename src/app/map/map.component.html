@@ -1,6 +1,7 @@
 <div #MapGL class="map clearfix"></div>
 
 <button class="btn btn-default" (click)="toggleRender()">Toggle Render</button>
+<button *ngIf="drawWalls" class="btn btn-default" (click)="stopDrawWall()">结束绘制</button>
 
 <div class="toolbar">
   <re-panel [collapsable]="true" [isCollapsed]="true">
