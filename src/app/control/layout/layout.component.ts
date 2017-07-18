@@ -163,11 +163,11 @@ export class LayoutComponent implements OnInit, OnDestroy {
                 this.setting.drawWalls.next(true)
               }
             },
-            {
+            /*{
               text: '围墙列表',
               icon: 'glyphicon glyphicon-list-alt',
               handler:()=>{}
-            },
+            },*/
           ]
         },
         {

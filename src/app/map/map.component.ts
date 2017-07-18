@@ -101,7 +101,6 @@ export class MapComponent implements OnInit, OnDestroy {
       if(res){
 
         this.noRotate = true;
-        this.noPan =true;
 
         $(this.renderer.domElement).on('mousedown', (e)=>{
           if(e.which === 1){
@@ -428,6 +427,7 @@ export class MapComponent implements OnInit, OnDestroy {
     let wallMaterial = new THREE.MeshBasicMaterial({color: 0x5bc0de,transparent: true, opacity: 0.8});
     let wall = new THREE.Mesh(wallGeometry, wallMaterial);
 
+    wall.name = `wall-${Date.parse(new Date().toDateString())}${this.wallsList.length}`;
     this.wallsList.push({wall:wall,checked: false});
     this.scene.add(wall);
   };
@@ -457,9 +457,43 @@ export class MapComponent implements OnInit, OnDestroy {
     this.scene.add(wall);
   };
 
+  deleteWall(wall){
+    this.scene.remove(this.scene.getObjectByName(wall.wall.name));
+    _.remove(this.wallsList, (item)=>{
+      return item.wall.name === wall.wall.name;
+    });
+  }
+
+  changeWallColor(wall) {
+    if(wall.checked){
+      this.scene.getObjectByName(wall.wall.name).material = new THREE.MeshBasicMaterial({color: 0x0f82de, transparent: true,opacity:0.8});
+    }else {
+      this.scene.getObjectByName(wall.wall.name).material = new THREE.MeshBasicMaterial({color: 0x5bc0de,transparent: true, opacity: 0.8});
+    }
+  }
+
+  deleteCheckedWalls(){
+    _.forEach(this.wallsList, (wall)=>{
+      if(wall.checked){
+        this.scene.remove(this.scene.getObjectByName(wall.wall.name));
+      }
+    });
+
+    this.wallsList = _.filter(this.wallsList, ['checked', false])
+  }
+
+  deleteAllWalls(){
+    _.forEach(this.wallsList, (wall)=>{
+      this.scene.remove(this.scene.getObjectByName(wall.wall.name));
+    });
+    this.wallsList = [];
+  }
+
   stopDrawWall(){
     this.setting.drawWalls.next(false);
   }
+
+
 
   toggleRender(){
     this.doRenderFlag = !this.doRenderFlag;

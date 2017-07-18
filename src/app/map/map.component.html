@@ -132,6 +132,25 @@
       <button type="button" class="btn btn-default" (click)="addNewWall(wallSX, wallSY, wallEX,wallEY)">添加围墙</button>
     </re-panel-body>
   </re-panel>
+
+  <re-panel [collapsable]="true" [isCollapsed]="true">
+    <re-panel-header>
+      <strong>围墙列表</strong>
+    </re-panel-header>
+    <re-panel-body>
+      <ul *ngIf="wallsList">
+        <li *ngFor="let theWall of wallsList">
+          <div>
+            <input type="checkbox" name="deleteWallLists" value={{theWall.wall.name}} [(ngModel)]="theWall.checked" (change)="changeWallColor(theWall)">
+            name:<span>{{theWall.wall.name}}</span>
+            <button class="btn btn-sm btn-default" type="button" (click)="deleteWall(theWall)">Delete</button>
+          </div>
+        </li>
+      </ul>
+      <button class="btn btn-default" type="button" (click)="deleteCheckedWalls()">删除选中项</button>
+      <button class="btn btn-default" type="button" (click)="deleteAllWalls()">删除全部</button>
+    </re-panel-body>
+  </re-panel>
 </div>
 
 
