@@ -8,11 +8,14 @@ import { SettingService } from '../service/setting.service';
 import * as _ from 'lodash';
 import * as $ from 'jquery';
 
+export class Point{x: any; y: any; z: any}
+
 @Component({
   selector: 'app-map',
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.scss'],
 })
+
 export class MapComponent implements OnInit, OnDestroy {
 
   renderer ;
@@ -44,6 +47,13 @@ export class MapComponent implements OnInit, OnDestroy {
 
 
   drawWalls: boolean = false;
+  wallStartPoint: Point;
+  wallEndPoint: Point;
+  wallSX = 0;
+  wallSY = 0;
+  wallEX = 0;
+  wallEY = 0;
+  wallsList = [];
 
   routeSub;
 
@@ -89,14 +99,32 @@ export class MapComponent implements OnInit, OnDestroy {
     this.setting.drawWalls.subscribe((res)=>{
       this.drawWalls = res;
       if(res){
+
+        this.noRotate = true;
+        this.noPan =true;
+
         $(this.renderer.domElement).on('mousedown', (e)=>{
           if(e.which === 1){
             this.onDocumentMouseDown(e)
           }
+          if(e.which === 3){
+            this.wallStartPoint = null;
+            if(this.scene.getObjectByName('willDrawWall')){
+              this.scene.remove(this.scene.getObjectByName('willDrawWall'));
+            }
+          }
+        });
+        $(this.renderer.domElement).on('mousemove', (e)=>{
+          this.onDocumentMouseMove(e);
         });
       }
       else {
         $(this.renderer.domElement).unbind('mousedown');
+        $(this.renderer.domElement).unbind('mousemove');
+        this.noRotate = false;
+        this.wallStartPoint = null;
+        this.wallEndPoint = null;
+        console.log(this.wallsList);
       }
     })
   }
@@ -124,15 +152,15 @@ export class MapComponent implements OnInit, OnDestroy {
 
   initCamera(){
     this.camera = new THREE.PerspectiveCamera(45,1000/800,0.1,100000);
-    this.camera.position.x = 0;
-    this.camera.position.y = 0;
+    this.camera.position.x = 500;
+    this.camera.position.y = 500;
     this.camera.position.z = 2600;
     this.camera.up.x = 0;
     this.camera.up.y = 1;
     this.camera.up.z = 0;
     this.camera.lookAt({
-      x:0,
-      y:0,
+      x:500,
+      y:500,
       z:0
     });
   }
@@ -153,7 +181,6 @@ export class MapComponent implements OnInit, OnDestroy {
     let plane = new THREE.Mesh(planeGeometry, planeMaterial);
 
 
-    //plane.rotation.x = -0.5 * Math.PI;
     plane.position.x = 0;
     plane.position.y = 0;
     plane.position.z = -1;
@@ -214,10 +241,11 @@ export class MapComponent implements OnInit, OnDestroy {
 
   initTrackBallControls(){
     this.trackBallControls = new Trackballcontrols(this.camera, this.renderer.domElement);
-    this.trackBallControls.target.set(0,0,0);
+    this.trackBallControls.target.set(500,500,0);
     this.trackBallControls.rotateSpeed = 3.0;
     this.trackBallControls.zoomSpeed = 1.0;
     this.trackBallControls.panSpeed = 1.0;
+
   }
 
   initSphereLabel(label){
@@ -343,13 +371,91 @@ export class MapComponent implements OnInit, OnDestroy {
     let intersects = raycaster.intersectObjects(this.scene.children);
 
     if (intersects.length > 0) {
-      console.log(intersects[0]);
+      let point = intersects[0].point;
+      if(this.wallStartPoint){
+        this.wallEndPoint = point;
+        this.wallEX = this.wallEndPoint.x;
+        this.wallEY = this.wallEndPoint.y;
+        this.addNewWall(this.wallStartPoint.x,this.wallStartPoint.y ,this.wallEndPoint.x,this.wallEndPoint.y);
+        this.wallStartPoint = this.wallEndPoint;
+      }else{
+        this.wallStartPoint = point;
+        this.wallSX = this.wallStartPoint.x;
+        this.wallSY = this.wallStartPoint.y;
+      }
     }
   }
 
-  drawWall(){
+  onDocumentMouseMove(event) {
+    event.preventDefault();
+    let vector = new THREE.Vector3(( event.clientX / window.innerWidth ) * 2 - 1, -( event.clientY / window.innerHeight ) * 2 + 1, 0.5);
+    vector = vector.unproject(this.camera);
 
+    let raycaster = new THREE.Raycaster(this.camera.position, vector.sub(this.camera.position).normalize());
+
+    let intersects = raycaster.intersectObjects(this.scene.children);
+
+    if (intersects.length > 0) {
+      let point = intersects[0].point;
+
+      if(this.wallStartPoint){
+        this.wallEndPoint = point;
+        this.scene.remove(this.scene.getObjectByName('willDrawWall'));
+        this.resetWall(this.wallStartPoint.x,this.wallStartPoint.y ,point.x,point.y);
+      }else{
+      }
+    }
   }
+
+  addNewWall(x1,y1,x2,y2){
+    let vertices = [
+      new THREE.Vector3(x1,y1,0),
+      new THREE.Vector3(x1,y1,1500),
+      new THREE.Vector3(x2,y2,0),
+      new THREE.Vector3(x2,y2,1500),
+    ];
+
+    let faces = [
+      new THREE.Face3(0, 1, 2),
+      new THREE.Face3(1, 2, 3),
+      new THREE.Face3(2, 1, 0),
+      new THREE.Face3(3, 2, 1)
+    ];
+
+    let wallGeometry = new THREE.Geometry();
+    wallGeometry.vertices = vertices;
+    wallGeometry.faces= faces;
+    let wallMaterial = new THREE.MeshBasicMaterial({color: 0x5bc0de,transparent: true, opacity: 0.8});
+    let wall = new THREE.Mesh(wallGeometry, wallMaterial);
+
+    this.wallsList.push({wall:wall,checked: false});
+    this.scene.add(wall);
+  };
+
+
+  resetWall(x1,y1,x2,y2){
+    let vertices = [
+      new THREE.Vector3(x1,y1,0),
+      new THREE.Vector3(x1,y1,1500),
+      new THREE.Vector3(x2,y2,0),
+      new THREE.Vector3(x2,y2,1500),
+    ];
+
+    let faces = [
+      new THREE.Face3(0, 1, 2),
+      new THREE.Face3(1, 2, 3),
+      new THREE.Face3(2, 1, 0),
+      new THREE.Face3(3, 2, 1)
+    ];
+
+    let wallGeometry = new THREE.Geometry();
+    wallGeometry.vertices = vertices;
+    wallGeometry.faces= faces;
+    let wallMaterial = new THREE.MeshBasicMaterial({color: 0x5bc0de,transparent: true, opacity: 0.8});
+    let wall = new THREE.Mesh(wallGeometry, wallMaterial);
+    wall.name = "willDrawWall";
+    this.scene.add(wall);
+  };
 
   stopDrawWall(){
     this.setting.drawWalls.next(false);

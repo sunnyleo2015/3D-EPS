@@ -2,7 +2,7 @@
 
 <button class="btn btn-default" (click)="toggleRender()">Toggle Render</button>
 <button *ngIf="drawWalls" class="btn btn-default" (click)="stopDrawWall()">结束绘制</button>
-
+<span *ngIf="noRotate || noPan">当前已锁定角度</span>
 <div class="toolbar">
   <re-panel [collapsable]="true" [isCollapsed]="true">
     <re-panel-header>
@@ -28,7 +28,7 @@
     </re-panel-header>
     <re-panel-body>
       <div class="btn-group">
-        <button class="btn btn-default btn-secondary" (click)="resetObservationFace(0,0,2600)">观察 XY 面</button>
+        <button class="btn btn-default btn-secondary" (click)="resetObservationFace(500,500,2600)">观察 XY 面</button>
         <button class="btn btn-default btn-secondary" (click)="resetObservationFace(0,2600,0)">观察 XZ 面</button>
         <button class="btn btn-default btn-secondary" (click)="resetObservationFace(2600,0,0)">观察 YZ 面</button>
         <button class="btn btn-default btn-secondary" (click)="initCamera();initTrackBallControls();">重置镜头</button>
@@ -53,6 +53,83 @@
         <input type="checkbox" id="noPan" name="noPan" [(ngModel)]="noPan" >
         <label for="noPan">No Pan</label>
       </div>
+    </re-panel-body>
+  </re-panel>
+
+  <re-panel [collapsable]="true" *ngIf="drawWalls">
+    <re-panel-header>
+      <strong>围墙绘制信息</strong>
+    </re-panel-header>
+    <re-panel-body>
+      <div class="row" *ngIf="wallStartPoint">
+        <h6>起始点</h6>
+        <div class="col-md-6">
+          <div class="input-group">
+            <label for="wallStartX">X: </label>
+            <input type="number" id="wallStartX" name="wallStartX" [(ngModel)]="wallStartPoint.x">
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="input-group">
+            <label for="wallStartY">Y: </label>
+            <input type="number" id="wallStartY" name="wallStartY" [(ngModel)]="wallStartPoint.y">
+          </div>
+        </div>
+      </div>
+      <div class="row" *ngIf="wallEndPoint">
+        <h6>结束点</h6>
+        <div class="col-md-6">
+          <div class="input-group">
+            <label for="wallStartX">X: </label>
+            <input type="number" id="wallEndX" name="wallEndX" [(ngModel)]="wallEndPoint.x">
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="input-group">
+            <label for="wallEndY">Y: </label>
+            <input type="number" id="wallEndY" name="wallEndY" [(ngModel)]="wallEndPoint.y">
+          </div>
+        </div>
+      </div>
+    </re-panel-body>
+  </re-panel>
+
+  <re-panel [collapsable]="true" [isCollapsed]="true" *ngIf="drawWalls">
+    <re-panel-header>
+      <strong>精确添加围墙</strong>
+    </re-panel-header>
+    <re-panel-body>
+      <div class="row">
+        <h6>起始点</h6>
+        <div class="col-md-6">
+          <div class="input-group">
+            <label for="wallSX">X: </label>
+            <input type="number" id="wallSX" name="wallSX" [(ngModel)]="wallSX">
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="input-group">
+            <label for="wallSY">Y: </label>
+            <input type="number" id="wallSY" name="wallSY" [(ngModel)]="wallSY">
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <h6>结束点</h6>
+        <div class="col-md-6">
+          <div class="input-group">
+            <label for="wallEX">X: </label>
+            <input type="number" id="wallEX" name="wallEX" [(ngModel)]="wallEX">
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="input-group">
+            <label for="wallEY">Y: </label>
+            <input type="number" id="wallEY" name="wallEY" [(ngModel)]="wallEY">
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn btn-default" (click)="addNewWall(wallSX, wallSY, wallEX,wallEY)">添加围墙</button>
     </re-panel-body>
   </re-panel>
 </div>
